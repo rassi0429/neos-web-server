@@ -24,7 +24,7 @@ app.get("*", (req, res) => {
         }, 30 * 1000)
         const servers = domainMap.get(req.headers.host)
         servers.forEach(s => {
-            s.send(`GET\n${path}\n${sessionId}`)
+            s.send(`GET\n${req.path}\n${sessionId}`)
         })
     } else {
         res.status(404).send("NO_SERVER_FOUND")
