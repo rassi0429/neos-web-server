@@ -19,8 +19,10 @@ app.get("*", (req, res) => {
     if (domainMap.has(req.headers.host)) {
         resMap.set(sessionId, res)
         setTimeout(() => {
-            res.status(500).send("SERVER_TIMEOUT")
-            resMap.delete(sessionId)
+            try {
+                res.status(500).send("SERVER_TIMEOUT")
+                resMap.delete(sessionId)
+            } catch {}
         }, 30 * 1000)
         const servers = domainMap.get(req.headers.host)
         servers.forEach(s => {
