@@ -17,7 +17,7 @@ app.get("*", (req, res) => {
     console.log("path", req.path) // /hoge/hage/hagame
     const sessionId = uuidv4()
     if (domainMap.has(req.headers.host)) {
-        resMap.set(sessionId, req)
+        resMap.set(sessionId, res)
         setTimeout(() => {
             res.status(500).send("SERVER_TIMEOUT")
             resMap.delete(sessionId)
