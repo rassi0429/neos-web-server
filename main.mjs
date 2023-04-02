@@ -7,6 +7,7 @@ const app = express()
 const server = new http.createServer(app)
 const wss = new WebSocketServer({ server: server })
 app.set("trust proxy", true)
+app.use(express.json())
 server.listen(3000)
 
 const domainMap = new Map()
@@ -33,6 +34,27 @@ app.get("*", (req, res) => {
     }
 })
 
+app.post("*", (req, res) => {
+    console.log("host", req.headers.host) // hogehoge.neorb.app
+    console.log("path", req.path) // /hoge/hage/hagame
+    console.log("body", req.body) // /hoge/hage/hagame
+    const sessionId = uuidv4()
+    if (domainMap.has(req.headers.host)) {
+        resMap.set(sessionId, res)
+        setTimeout(() => {
+            try {
+                res.status(500).send("SERVER_TIMEOUT")
+                resMap.delete(sessionId)
+            } catch {}
+        }, 30 * 1000)
+        const servers = domainMap.get(req.headers.host)
+        servers.forEach(s => {
+            s.send(`POST\n${req.path}\n${sessionId}\n${req.body}`)
+        })
+    } else {
+        res.status(404).send("NO_SERVER_FOUND")
+    }
+})
 
 wss.on('connection', (ws, request) => {
     const room = request.headers.host
