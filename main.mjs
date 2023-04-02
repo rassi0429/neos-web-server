@@ -27,7 +27,7 @@ app.get("*", (req, res) => {
         }, 30 * 1000)
         const servers = domainMap.get(req.headers.host)
         servers.forEach(s => {
-            s.send(`GET\n${req.path}\n${sessionId}`)
+            s.send(`GET\n${req.path}\n${sessionId}\n`)
         })
     } else {
         res.status(404).send("NO_SERVER_FOUND")
@@ -39,6 +39,7 @@ app.post("*", (req, res) => {
     console.log("path", req.path) // /hoge/hage/hagame
     console.log("body", req.body) // /hoge/hage/hagame
     const sessionId = uuidv4()
+    console.log(`POST\n${req.path}\n${sessionId}\n${JSON.stringify(req.body)}`)
     if (domainMap.has(req.headers.host)) {
         resMap.set(sessionId, res)
         setTimeout(() => {
@@ -49,7 +50,7 @@ app.post("*", (req, res) => {
         }, 30 * 1000)
         const servers = domainMap.get(req.headers.host)
         servers.forEach(s => {
-            s.send(`POST\n${req.path}\n${sessionId}\n${req.body}`)
+            s.send(`POST\n${req.path}\n${sessionId}\n${JSON.stringify(req.body)}`)
         })
     } else {
         res.status(404).send("NO_SERVER_FOUND")
